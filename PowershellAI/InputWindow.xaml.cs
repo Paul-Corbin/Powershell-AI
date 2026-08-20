@@ -14,11 +14,18 @@ using System.Windows.Shapes;
 namespace PowershellAI;
 
 /// <summary>
-/// Interaction logic for MainWindow.xaml
+/// Interaction logic for InputWindow.xaml
 /// </summary>
-public partial class MainWindow : Window
+public partial class InputWindow : Window
 {
     private String defaultInputString;
+    private void TopBarDown(object sender, RoutedEventArgs e)
+    {
+        DragMove();
+    }
+    private void CloseClick(object sender, RoutedEventArgs e) { this.Close(); }
+
+    private void MinimizeClick(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
     private void InputFocusLost(object sender, RoutedEventArgs e)
     {
         if (defaultInputString == null) return;
@@ -30,9 +37,6 @@ public partial class MainWindow : Window
         if (!this.InputBox.Text.Equals(defaultInputString)) return;
         this.InputBox.Text = "";
     }
-    private void TopBarDown(object sender, RoutedEventArgs e) {
-        DragMove();
-    }
     private async void SubmitClick(object sender, RoutedEventArgs e) { 
         Debug.WriteLine("Submit");
         if (this.InputBox.Text.Equals("") || this.InputBox.Text.Equals(defaultInputString)) return;
@@ -40,12 +44,11 @@ public partial class MainWindow : Window
         Request request = new Request();
         Response response = await request.Submit(this.InputBox.Text);
         Debug.WriteLine(response.ToString());
+        OutputWindow outputWindow = new OutputWindow();
+        outputWindow.Show();
         this.Close();
     }
-    private void CloseClick(object sender, RoutedEventArgs e) { this.Close(); }
-
-    private void MinimizeClick(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
-    public MainWindow()
+    public InputWindow()
     {
         InitializeComponent();
         defaultInputString = this.InputBox.Text;
