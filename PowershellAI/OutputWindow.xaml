@@ -5,9 +5,9 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:PowershellAI"
         mc:Ignorable="d"
-        Title="Powershell AI" Height="90" Width="700" Top="10" ResizeMode="NoResize" WindowStyle="None" Topmost="True" WindowStartupLocation="CenterScreen" Background="{x:Null}" Foreground="{x:Null}">
+        Title="Powershell AI" Height="200" Width="600" Top="10" ResizeMode="NoResize" WindowStyle="None" Topmost="True" WindowStartupLocation="CenterScreen" Background="{x:Null}" Foreground="{x:Null}">
     <DockPanel LastChildFill="False" Margin="0,0,0,0">
-        <Border DockPanel.Dock="Top" Height="20" Width="700">
+        <Border DockPanel.Dock="Top" Height="20">
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#FF404040"/>
@@ -31,37 +31,233 @@
             </Grid>
 
         </Border>
-        <Border>
+        <Border Width="600">
             <Border.Background>
                 <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
                     <GradientStop Color="#FF272727"/>
                     <GradientStop Color="#FF1D1D1D" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
-            <Grid x:Name="ControlGrid" Margin="10,10,10,10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="550"/>
-                    <ColumnDefinition Width="150"/>
-                </Grid.ColumnDefinitions>
-                <Button x:Name="SubmitButton" Content="Submit" HorizontalAlignment="Left" VerticalAlignment="Top" Padding="0,0,0,0" Foreground="#FFB7B7B7" FontSize="24" BorderBrush="{x:Null}" Grid.Column="1" Width="120" Margin="10,-1,0,0" Height="52">
-                    <Button.Background>
-                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                            <GradientStop Color="#FF2F2F2F"/>
-                            <GradientStop Color="#FF353535" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Button.Background>
-                </Button>
-                <Rectangle x:Name="InputBackground" HorizontalAlignment="Left" VerticalAlignment="Top" Width="550" Height="50" StrokeThickness="0">
-                    <Rectangle.Fill>
-                        <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                            <GradientStop Color="#FF2F2F2F"/>
-                            <GradientStop Color="#FF353535" Offset="1"/>
-                        </LinearGradientBrush>
-                    </Rectangle.Fill>
-                </Rectangle>
-                <TextBox TextWrapping="Wrap" Text="Enter command" FontSize="24" x:Name="InputBox" HorizontalAlignment="Left" VerticalAlignment="Top" Margin="5,5,0,0" Width="540" Height="40" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" BorderBrush="{x:Null}"/>
+            <Grid x:Name="OutputGrid">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <ScrollViewer x:Name="ReferencesScroll" VerticalAlignment="Top" VerticalScrollBarVisibility="Auto" Padding="5,0,5,0" Grid.Row="1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
+                    <Grid x:Name="References">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                            <RowDefinition Height="35"/>
+                        </Grid.RowDefinitions>
+                        <Grid x:Name="Reference">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="125"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                            </Grid.ColumnDefinitions>
+                            <Rectangle x:Name="LinkBackground" StrokeThickness="0" Margin="0,0,0,5" Grid.Column="1">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock TextWrapping="Wrap" Text="Enter command" FontSize="16" x:Name="LinkBlock" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Margin="5,5,5,10" Grid.Column="1"/>
+                            <Button x:Name="CopyButton" Content="Open" Padding="0,0,0,0" Foreground="#FFB7B7B7" FontSize="16" BorderBrush="{x:Null}" Margin="5,0,0,5" Grid.Column="2" BorderThickness="0,0,0,0">
+                                <Button.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Button.Background>
+                            </Button>
+                            <Rectangle x:Name="ReferenceBackground" StrokeThickness="0" Margin="0,0,5,5">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock Text="Write-Host" FontSize="16" x:Name="LinkBlock_Copy" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Margin="5,5,10,10"/>
+                        </Grid>
+                        <Grid x:Name="Reference_Copy" Grid.Row="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="125"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                            </Grid.ColumnDefinitions>
+                            <Rectangle x:Name="LinkBackground1" StrokeThickness="0" Margin="0,0,0,5" Grid.Column="1">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock TextWrapping="Wrap" Text="Enter command" FontSize="16" x:Name="LinkBlock1" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Margin="5,5,5,10" Grid.Column="1"/>
+                            <Button x:Name="CopyButton2" Content="Open" Padding="0,0,0,0" Foreground="#FFB7B7B7" FontSize="16" BorderBrush="{x:Null}" Margin="5,0,0,5" Grid.Column="2" BorderThickness="0,0,0,0">
+                                <Button.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Button.Background>
+                            </Button>
+                            <Rectangle x:Name="ReferenceBackground1" StrokeThickness="0" Margin="0,0,5,5">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock Text="Write-Host" FontSize="16" x:Name="LinkBlock_Copy1" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Margin="5,5,10,10"/>
+                        </Grid>
+                        <Grid x:Name="Reference_Copy1" Grid.Row="2">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="125"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                            </Grid.ColumnDefinitions>
+                            <Rectangle x:Name="LinkBackground2" StrokeThickness="0" Margin="0,0,0,5" Grid.Column="1">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock TextWrapping="Wrap" Text="Enter command" FontSize="16" x:Name="LinkBlock2" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Margin="5,5,5,10" Grid.Column="1"/>
+                            <Button x:Name="CopyButton3" Content="Open" Padding="0,0,0,0" Foreground="#FFB7B7B7" FontSize="16" BorderBrush="{x:Null}" Margin="5,0,0,5" Grid.Column="2" BorderThickness="0,0,0,0">
+                                <Button.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Button.Background>
+                            </Button>
+                            <Rectangle x:Name="ReferenceBackground2" StrokeThickness="0" Margin="0,0,5,5">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock Text="Write-Host" FontSize="16" x:Name="LinkBlock_Copy2" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Margin="5,5,10,10"/>
+                        </Grid>
+                        <Grid x:Name="Reference_Copy2" Grid.Row="3">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="125"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                            </Grid.ColumnDefinitions>
+                            <Rectangle x:Name="LinkBackground3" StrokeThickness="0" Margin="0,0,0,5" Grid.Column="1">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock TextWrapping="Wrap" Text="Enter command" FontSize="16" x:Name="LinkBlock3" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Margin="5,5,5,10" Grid.Column="1"/>
+                            <Button x:Name="CopyButton4" Content="Open" Padding="0,0,0,0" Foreground="#FFB7B7B7" FontSize="16" BorderBrush="{x:Null}" Margin="5,0,0,5" Grid.Column="2" BorderThickness="0,0,0,0">
+                                <Button.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Button.Background>
+                            </Button>
+                            <Rectangle x:Name="ReferenceBackground3" StrokeThickness="0" Margin="0,0,5,5">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock Text="Write-Host" FontSize="16" x:Name="LinkBlock_Copy3" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Margin="5,5,10,10"/>
+                        </Grid>
+                        <Grid x:Name="Reference_Copy3" Grid.Row="4
+                              ">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="125"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                            </Grid.ColumnDefinitions>
+                            <Rectangle x:Name="LinkBackground4" StrokeThickness="0" Margin="0,0,0,5" Grid.Column="1">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock TextWrapping="Wrap" Text="Enter command" FontSize="16" x:Name="LinkBlock4" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Margin="5,5,5,10" Grid.Column="1"/>
+                            <Button x:Name="CopyButton5" Content="Open" Padding="0,0,0,0" Foreground="#FFB7B7B7" FontSize="16" BorderBrush="{x:Null}" Margin="5,0,0,5" Grid.Column="2" BorderThickness="0,0,0,0">
+                                <Button.Background>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Button.Background>
+                            </Button>
+                            <Rectangle x:Name="ReferenceBackground4" StrokeThickness="0" Margin="0,0,5,5">
+                                <Rectangle.Fill>
+                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                        <GradientStop Color="#FF2F2F2F"/>
+                                        <GradientStop Color="#FF353535" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Rectangle.Fill>
+                            </Rectangle>
+                            <TextBlock Text="Write-Host" FontSize="16" x:Name="LinkBlock_Copy4" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Margin="5,5,10,10"/>
+                        </Grid>
+
+                    </Grid>
+
+                </ScrollViewer>
+                <Grid x:Name="ControlGrid1" Margin="5,5,5,5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="60"/>
+                        <ColumnDefinition Width="60"/>
+                    </Grid.ColumnDefinitions>
+                    <Button x:Name="SendButton1" Content="Send" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0,0,0,0" Foreground="#FFB7B7B7" FontSize="16" BorderBrush="{x:Null}" Width="55" Margin="5,0,0,0" Grid.Column="3" Height="30">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF2F2F2F"/>
+                                <GradientStop Color="#FF353535" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                    <Rectangle x:Name="CommandBackground1" HorizontalAlignment="Center" VerticalAlignment="Top" Height="30" StrokeThickness="0" Width="470">
+                        <Rectangle.Fill>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF2F2F2F"/>
+                                <GradientStop Color="#FF353535" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Rectangle.Fill>
+                    </Rectangle>
+                    <TextBlock Text="Write-Host &quot;Hello, World!&quot;" FontSize="16" x:Name="CommandBlock1" HorizontalAlignment="Center" VerticalAlignment="Top" Margin="5,5,5,0" Height="20" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Width="460"/>
+                    <Button x:Name="CopyButton1" Content="Copy" HorizontalAlignment="Left" VerticalAlignment="Center" Padding="0,0,0,0" Foreground="#FFB7B7B7" FontSize="16" BorderBrush="{x:Null}" Margin="5,0,0,0" Grid.Column="1" Height="30" Width="55">
+                        <Button.Background>
+                            <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                                <GradientStop Color="#FF2F2F2F"/>
+                                <GradientStop Color="#FF353535" Offset="1"/>
+                            </LinearGradientBrush>
+                        </Button.Background>
+                    </Button>
+                </Grid>
+
             </Grid>
 
         </Border>
+        <Grid Width="100"/>
     </DockPanel>
 </Window>
