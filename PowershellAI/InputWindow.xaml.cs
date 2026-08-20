@@ -40,6 +40,7 @@ public partial class MainWindow : Window
         Request request = new Request();
         Response response = await request.Submit(this.InputBox.Text);
         Debug.WriteLine(response.ToString());
+        this.Close();
     }
     private void CloseClick(object sender, RoutedEventArgs e) { this.Close(); }
 
