@@ -22,9 +22,9 @@ namespace PowershellAI
         {
             //Build JSON object for the request
             JsonContent content = JsonContent.Create(new JsonObject{ 
-            ["model"] = API_MODEL,
-            ["mode"] = API_MODE,
-            ["max_tokens"] = MAX_TOKENS,
+            ["model"] = ApiModel,
+            ["mode"] = ApiMode,
+            ["max_tokens"] = MaxTokens,
             ["messages"] = new JsonArray { 
                 new JsonObject{
                     ["role"]="user",
