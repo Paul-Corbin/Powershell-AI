@@ -7,14 +7,14 @@
         mc:Ignorable="d"
         Title="Powershell AI" Height="65" Width="500" Top="10" ResizeMode="NoResize" WindowStyle="None" Topmost="True" WindowStartupLocation="CenterScreen" Background="{x:Null}" Foreground="{x:Null}">
     <DockPanel LastChildFill="True" Margin="0,0,0,0">
-        <Border DockPanel.Dock="Top">
-            <Border.Background>
-                <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                    <GradientStop Color="#FF404040"/>
-                    <GradientStop Color="#FF3E3E3E" Offset="1"/>
-                </LinearGradientBrush>
-            </Border.Background>
-            <Grid x:Name="TopBar" Height="25">
+        <Border x:Name="TopBarBorder" DockPanel.Dock="Top" Height="25">
+            <Grid x:Name="TopBarGrid" MouseLeftButtonDown="TopBarDown" Height="25">
+                <Grid.Background>
+                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
+                        <GradientStop Color="#FF404040"/>
+                        <GradientStop Color="#FF3E3E3E" Offset="1"/>
+                    </LinearGradientBrush>
+                </Grid.Background>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="25"/>
@@ -22,15 +22,14 @@
                     <ColumnDefinition Width="25"/>
                     <ColumnDefinition Width="5"/>
                 </Grid.ColumnDefinitions>
-                <Button x:Name="MinimizeButton" Click="MinimizeClick" Panel.ZIndex="1" Background="{x:Null}" Foreground="{x:Null}" FontSize="20" BorderBrush="{x:Null}" Grid.Column="1" Width="25" Height="25" TabIndex="3">
+                <Button x:Name="MinimizeButton" Click="MinimizeClick" Panel.ZIndex="1" Background="{x:Null}" Foreground="{x:Null}" FontSize="20" BorderBrush="{x:Null}" Grid.Column="1" Width="25" Height="25" TabIndex="2147483646">
                     <TextBlock x:Name="MinimizeBackground" TextWrapping="NoWrap" Text="-" Grid.Column="1" TextAlignment="Center" Foreground="White" FontSize="36" LineHeight="9" Margin="0,-8,0,0" VerticalAlignment="Center"/>
                 </Button>
-                <Button x:Name="CloseButton" Click="CloseClick" Grid.Column="3" Background="{x:Null}" FontSize="24" BorderBrush="{x:Null}" Width="25" Height="25" Foreground="White" VerticalAlignment="Top" HorizontalAlignment="Left" TabIndex="4">
+                <Button x:Name="CloseButton" Click="CloseClick" Grid.Column="3" Background="{x:Null}" FontSize="24" BorderBrush="{x:Null}" Width="25" Height="25" Foreground="White" VerticalAlignment="Top" HorizontalAlignment="Left">
                     <TextBlock x:Name="CloseBackground" TextWrapping="NoWrap" Text="x" Grid.Column="3" Cursor="" TextAlignment="Center" Foreground="White" FontWeight="Bold" FontSize="18" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,0,5"/>
                 </Button>
-                <TextBlock x:Name="Title" MouseLeftButtonDown="TopBarDown" TextWrapping="Wrap" Text='   Powershell AI' Foreground="#FFB7B7B7" FontWeight="Bold" FontSize="16"/>
+                <TextBlock x:Name="TopBarTitle" MouseLeftButtonDown="TopBarDown" TextWrapping="Wrap" Text='Powershell AI' Foreground="#FFB7B7B7" FontWeight="Bold" LineHeight="14" VerticalAlignment="Center" Panel.ZIndex="1" HorizontalAlignment="Left" Margin="5,0,0,0"/>
             </Grid>
-
         </Border>
         <Border>
             <Border.Background>

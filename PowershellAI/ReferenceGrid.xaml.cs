@@ -21,7 +21,7 @@ namespace PowershellAI
     /// </summary>
     public partial class ReferenceGrid : UserControl
     {
-        private string link;
+        private string link = "";
         public void SetCommand(string command)
         {
             this.ReferenceCommand.Text = command;

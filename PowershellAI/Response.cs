@@ -10,41 +10,39 @@ namespace PowershellAI
     internal class Response
     {
         //Private fields
-        private string Command = "";
-        private Dictionary<string, string> References = new Dictionary<string, string>();
+        private string _command = "";
+        private Dictionary<string, string> _references = new();
         
         //Constructor
-        public Response(string Command, Dictionary<string, string> References)
+        public Response(string command, Dictionary<string, string> references)
         {
-            setCommand(Command);
-            setReferences(References);
+            SetCommand(command);
+            SetReferences(references);
         }
         //setters getters
-        public void setCommand(string Command)
+        public void SetCommand(string command)
         {
-            this.Command = Command;
+            _command = command;
         }
-        public string getCommand()
+        public string GetCommand()
         {
-            return this.Command;
+            return _command;
         }
-        public void setReferences(Dictionary<string, string> References)
+        public void SetReferences(Dictionary<string, string> references)
         {
-            this.References = References;
+            _references = references;
         }
-        public Dictionary<string, string> getReferences()
+        public Dictionary<string, string> GetReferences()
         {
-            return this.References;
+            return _references;
         }
-        //Override tostring to verify response objects during requests
+        //Override ToString to verify response objects during requests
         public override string ToString()
         {
-            string text = $"Command: {getCommand()}\nReferences: [";
-            foreach (var reference in getReferences())
-            {
-                text += $"\n{reference.Key}: {reference.Value}";
-            }
-            text += "\n]";
+            var text = $"Command: {GetCommand()}\nReferences: [{string.Join(
+                "\n",
+                GetReferences().Select(reference => $"{reference.Key}: {reference.Value}")
+            )}\n]";
             return text;
         }
     }

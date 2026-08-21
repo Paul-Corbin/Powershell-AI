@@ -6,7 +6,7 @@
              xmlns:local="clr-namespace:PowershellAI"
              mc:Ignorable="d" 
              d:DesignHeight="30" d:DesignWidth="600">
-    <Grid x:Name="ReferenceGrid" Margin="0,5,0,0">
+    <Grid Margin="0,5,0,0">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="125"/>
             <ColumnDefinition Width="*"/>

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
@@ -22,9 +23,21 @@ namespace PowershellAI
     {
         private void TopBarDown(object sender, RoutedEventArgs e)
         {
-            DragMove();
+            try
+            {
+                DragMove();
+            }
+            catch (Exception exception)
+            {
+                Debug.WriteLine(exception.Message);
+            }
         }
-        private void CloseClick(object sender, RoutedEventArgs e) { this.Hide(); }
+        private void CloseClick(object sender, RoutedEventArgs e) { 
+            this.Hide();
+            //Clear references so this can be reused.
+            this.References.Children.Clear();
+            this.References.RowDefinitions.Clear();
+        }
 
         private void MinimizeClick(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
         public OutputWindow()
@@ -35,17 +48,22 @@ namespace PowershellAI
         internal void Load(Response response)
         {
             int i = 0;
-            foreach (var reference in response.getReferences())
+            int RowHeight = 35;
+            this.CommandBlock1.Text = response.GetCommand();
+            foreach (var reference in response.GetReferences())
             {
+                Debug.WriteLine($"New row:\nCommand: {reference.Key}\nLink: {reference.Value}\nRow: {i}");
                 ReferenceGrid newReferenceGrid = new ReferenceGrid();
                 newReferenceGrid.SetCommand(reference.Key);
                 newReferenceGrid.SetLink(reference.Value);
                 RowDefinition newRow = new RowDefinition();
-                newRow.Height = new GridLength(35);
+                newRow.Height = new GridLength(RowHeight);
                 this.References.RowDefinitions.Add(newRow);
-                Grid.SetRow(newReferenceGrid, i);
+                Grid.SetRow(newReferenceGrid, i++);
                 this.References.Children.Add(newReferenceGrid);
             }
+            this.Height = this.TopBarGrid.Height+6;
+            this.Height += i > 5 ? (5 * RowHeight) : (++i * RowHeight);
             this.Show();
         }
     }

@@ -9,14 +9,12 @@ namespace PowershellAI
 {
     internal class Request
     {
-        private HttpClient _httpClient = new HttpClient();
-        private Response response;
-
-        private string API_URL = "https://ai.hatz.ai/v1/anthropic/messages";
-        private string API_MODEL = "anthropic.claude-haiku-4-5";
-        private string API_KEY = "6ae32ae1-a8a9-44bb-bfd0-80a5bed25a3c"; // REMOVE, STORE IN CREDENTIAL MANAGER
-        private string API_MODE = "lite"; //From fastest/least tokens -> slowest/most tokens- lite, performance, turbo
-        private string MAX_TOKENS = "300000"; //Absurdly high but good for our purposes
+        private readonly HttpClient _httpClient= new HttpClient();
+        private const string ApiUrl = "https://ai.hatz.ai/v1/anthropic/messages";
+        private const string ApiModel = "anthropic.claude-haiku-4-5";
+        private const string ApiKey = "6ae32ae1-a8a9-44bb-bfd0-80a5bed25a3c"; // REMOVE, STORE IN CREDENTIAL MANAGER
+        private const string ApiMode = "lite"; //From fastest/least tokens -> slowest/most tokens- lite, performance, turbo
+        private const string MaxTokens = "300000"; //Absurdly high but good for our purposes
 
         public async Task<Response> Submit(string submittedText)
         {
@@ -35,7 +33,9 @@ namespace PowershellAI
                     ["content"] = """
         You are a system assistant that translates requests into PowerShell commands.
         Respond ONLY with a valid JSON object format in pure text.
-    
+        Include references for ALL commands you provide.
+        If you do not know the answer, respond with 'ERROR: Request not understood' as the "command" and provide no references.
+
         NEVER include markdown code fences, backticks, explanations, or any other text.
     
         Response format:
@@ -55,16 +55,16 @@ namespace PowershellAI
             });
             //Submit HTTP Request
             Debug.WriteLine("Submitting");
-            string c = await content.ReadAsStringAsync();
+            var c = await content.ReadAsStringAsync();
             Debug.WriteLine(c);
-            Uri uri = new Uri(API_URL);
-            HttpRequestMessage requestMesage = new HttpRequestMessage(HttpMethod.Post, uri);
-            requestMesage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", API_KEY);
+            var uri = new Uri(ApiUrl);
+            var requestMesage = new HttpRequestMessage(HttpMethod.Post, uri);
+            requestMesage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
             requestMesage.Content = content;
-            HttpResponseMessage response = await _httpClient.SendAsync(requestMesage);
+            var httpResponse = await _httpClient.SendAsync(requestMesage);
             //Really long string manipulation...
-            string responseText = JsonNode.Parse(
-                    await response.Content.ReadAsStringAsync()
+            var responseText = JsonNode.Parse(
+                    await httpResponse.Content.ReadAsStringAsync()
                 )!
                 ["content"]!
                 [0]!
@@ -85,17 +85,28 @@ namespace PowershellAI
             */
 
             //Parse Json to get the command and the references in the correct format
-            JsonObject responseObject = JsonNode.Parse(responseText)!.AsObject();
-            string command = responseObject["command"]!.ToString();
-            JsonObject referencesObject = responseObject["references"]!.AsObject();
-            Dictionary<String,String> references = new Dictionary<string, string>();
-            foreach (var reference in referencesObject)
+            try
             {
-                if (reference.Value == null) continue;
-                references.Add(reference.Key, reference.Value.ToString());
+                Debug.WriteLine(responseText);
+                JsonObject responseObject = JsonNode.Parse(responseText)!.AsObject();
+                string command = responseObject["command"]!.ToString();
+                Debug.WriteLine(command);
+                JsonObject referencesObject = responseObject["references"]!.AsObject();
+                Dictionary<String, String> references = new Dictionary<string, string>();
+                foreach (var reference in referencesObject)
+                {
+                    if (reference.Value == null) continue;
+                    Debug.WriteLine(reference.Key, reference.Value);
+                    references.Add(reference.Key, reference.Value.ToString());
+                }
+
+                Response response = new Response(command, references);
+                return response;
             }
-            this.response = new Response(command, references);
-            return this.response;
+            catch (Exception exception)
+            {
+                throw new Exception(exception.Message);
+            }
         }
     }
 }

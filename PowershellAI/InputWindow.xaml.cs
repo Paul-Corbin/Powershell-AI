@@ -18,44 +18,50 @@ namespace PowershellAI;
 /// </summary>
 public partial class InputWindow : Window
 {
-    private String defaultInputString;
+    private readonly string _defaultInputString = "Enter command...";
     private void TopBarDown(object sender, RoutedEventArgs e)
     {
-        DragMove();
+        try
+        {
+            DragMove();
+        }
+        catch (Exception exception)
+        {
+            Debug.WriteLine(exception.Message);
+        }
     }
-    private void CloseClick(object sender, RoutedEventArgs e) { this.Hide(); }
-
+    private void CloseClick(object sender, RoutedEventArgs e) { 
+        this.ResetInput();
+    }
+    private void ResetInput()
+    {
+        this.Hide();
+        this.InputBox.Text = _defaultInputString;
+    }
     private void MinimizeClick(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
     private void InputFocusLost(object sender, RoutedEventArgs e)
     {
-        if (defaultInputString == null) return;
         if (!this.InputBox.Text.Equals("")) return;
-        this.InputBox.Text = defaultInputString;
+        this.InputBox.Text = _defaultInputString;
     }
     private void InputGotFocus(object sender, RoutedEventArgs e) {
-        if (defaultInputString == null) return;
-        if (!this.InputBox.Text.Equals(defaultInputString)) return;
+        if (!this.InputBox.Text.Equals(_defaultInputString)) return;
         this.InputBox.Text = "";
-    }
-
-    public void ResetInput()
-    {
-        if (defaultInputString == null) return;
-        this.InputBox.Text = defaultInputString;
     }
     private async void SubmitClick(object sender, RoutedEventArgs e) { 
         Debug.WriteLine("Submit");
-        if (this.InputBox.Text.Equals("") || this.InputBox.Text.Equals(defaultInputString)) return;
-        this.Hide();
-        Request request = new Request();
-        Response response = await request.Submit(this.InputBox.Text);
+        if (this.InputBox.Text.Equals("") || this.InputBox.Text.Equals(_defaultInputString)) return;
+        var requestString = this.InputBox.Text;
+        this.ResetInput();
+        var request = new Request();
+        var response = await request.Submit(requestString);
         Debug.WriteLine(response.ToString());
-        OutputWindow outputWindow = new OutputWindow();
+        var outputWindow = new OutputWindow();
         outputWindow.Load(response);
     }
     public InputWindow()
     {
         InitializeComponent();
-        defaultInputString = this.InputBox.Text;
+        this.InputBox.Text = _defaultInputString;
     }
 }
