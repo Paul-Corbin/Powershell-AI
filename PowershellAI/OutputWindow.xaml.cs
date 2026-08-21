@@ -38,10 +38,10 @@ namespace PowershellAI
             foreach (var reference in response.getReferences())
             {
                 ReferenceGrid newReferenceGrid = new ReferenceGrid();
-                newReferenceGrid.ReferenceLink.Text = reference.Value;
-                newReferenceGrid.ReferenceCommand.Text = reference.Key;
+                newReferenceGrid.SetCommand(reference.Key);
+                newReferenceGrid.SetLink(reference.Value);
                 RowDefinition newRow = new RowDefinition();
-                newRow.Height = new GridLength(30);
+                newRow.Height = new GridLength(35);
                 this.References.RowDefinitions.Add(newRow);
                 Grid.SetRow(newReferenceGrid, i);
                 this.References.Children.Add(newReferenceGrid);

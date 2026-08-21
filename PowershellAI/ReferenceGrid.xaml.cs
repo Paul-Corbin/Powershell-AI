@@ -26,16 +26,18 @@ namespace PowershellAI
         {
             this.ReferenceCommand.Text = command;
         }
-        public void SetReferenceLink(string link)
+        public void SetLink(string link)
         {
             this.link = link;
             this.ReferenceLink.Text = link;
         }
 
-        public void OpenLink()
+        public void OpenLink(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine($"{this.ReferenceCommand.Text}: {this.link}");
             // Open the link in the default web browser
+            Debug.WriteLine($"{this.ReferenceCommand.Text}: {this.link}");
+            if (this.link == "") return;
+            Process.Start(this.link);
         }
         public ReferenceGrid()
         {
