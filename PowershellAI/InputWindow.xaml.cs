@@ -19,6 +19,7 @@ namespace PowershellAI;
 public partial class InputWindow : Window
 {
     private readonly string _defaultInputString = "Enter command...";
+    private bool _textCleared = false;
     private void TopBarDown(object sender, RoutedEventArgs e)
     {
         try
@@ -43,6 +44,14 @@ public partial class InputWindow : Window
     {
         if (!this.InputBox.Text.Equals("")) return;
         this.InputBox.Text = _defaultInputString;
+        _textCleared = false;
+    }
+
+    private void InputKeyDown(object sender, RoutedEventArgs e)
+    {
+        if (_textCleared) return;
+        this.InputBox.Text = "";
+        _textCleared = true;
     }
     private void InputGotFocus(object sender, RoutedEventArgs e) {
         if (!this.InputBox.Text.Equals(_defaultInputString)) return;
@@ -59,9 +68,17 @@ public partial class InputWindow : Window
         var outputWindow = new OutputWindow();
         outputWindow.Load(response);
     }
+
+    private void Open(object sender, string e)
+    {
+        this.ResetInput();
+        this.Show();
+        this.InputBox.Focus();
+    }
     public InputWindow()
     {
+        App.GlobalHotkey.HotkeyFired += Open;
         InitializeComponent();
-        this.InputBox.Text = _defaultInputString;
+        this.Hide();
     }
 }

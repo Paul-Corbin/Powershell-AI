@@ -10,7 +10,9 @@ namespace PowershellAI;
 /// </summary>
 public partial class App : Application
 {
-    private TaskbarIcon? Icon;
+    private TaskbarIcon? _icon;
+    internal static Hotkey? GlobalHotkey { get; private set; }
+
     private void ExitClick(object sender, RoutedEventArgs e)
     {
         Shutdown();
@@ -18,17 +20,18 @@ public partial class App : Application
     protected override void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
-        Icon = (TaskbarIcon)FindResource("TrayIcon");
+        _icon = (TaskbarIcon?)FindResource("TrayIcon");
+        GlobalHotkey = new Hotkey();
     }
     protected override void OnExit(ExitEventArgs e)
     {
-        if (Icon == null) return;
-        Icon.Dispose();
+        if (_icon == null) return;
+        _icon.Dispose();
         base.OnExit(e);
     }
     private void ShowMenu(object sender, RoutedEventArgs e)
     {
-        if (Icon == null) return;
-        Icon.ContextMenu.IsOpen = true;
+        if (_icon == null) return;
+        _icon.ContextMenu.IsOpen = true;
     }
 }
