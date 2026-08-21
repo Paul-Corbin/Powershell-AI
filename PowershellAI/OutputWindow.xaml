@@ -47,46 +47,7 @@
                 <ScrollViewer x:Name="ReferencesScroll" VerticalAlignment="Top" VerticalScrollBarVisibility="Auto" Padding="5,1,5,5" Grid.Row="1" VerticalContentAlignment="Stretch" HorizontalContentAlignment="Stretch">
                     <Grid x:Name="References" Margin="0,-5,0,0">
                         <Grid.RowDefinitions>
-                            <RowDefinition Height="35"/>
-                            <RowDefinition Height="35"/>
-                            <RowDefinition Height="35"/>
-                            <RowDefinition Height="35"/>
-                            <RowDefinition Height="35"/>
                         </Grid.RowDefinitions>
-                        <Grid x:Name="Reference" Margin="0,5,0,0">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="125"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="60"/>
-                            </Grid.ColumnDefinitions>
-                            <Rectangle x:Name="LinkBackground" StrokeThickness="0" Grid.Column="1">
-                                <Rectangle.Fill>
-                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                        <GradientStop Color="#FF2F2F2F"/>
-                                        <GradientStop Color="#FF353535" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                            <TextBox TextWrapping="Wrap" Text="Enter command" FontSize="16" x:Name="LinkBlock" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Margin="5,0,5,0" Grid.Column="1" IsReadOnly="True" MaxLines="1" BorderThickness="0,0,0,0"/>
-                            <Button x:Name="CopyButton" Content="Open" Padding="0,0,0,0" Foreground="#FFB7B7B7" FontSize="16" BorderBrush="{x:Null}" Margin="5,0,0,0" Grid.Column="2" BorderThickness="0,0,0,0" TabIndex="3">
-                                <Button.Background>
-                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                        <GradientStop Color="#FF2F2F2F"/>
-                                        <GradientStop Color="#FF353535" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Button.Background>
-                            </Button>
-                            <Rectangle x:Name="ReferenceBackground" StrokeThickness="0" Margin="0,0,5,0">
-                                <Rectangle.Fill>
-                                    <LinearGradientBrush EndPoint="0.5,1" StartPoint="0.5,0">
-                                        <GradientStop Color="#FF2F2F2F"/>
-                                        <GradientStop Color="#FF353535" Offset="1"/>
-                                    </LinearGradientBrush>
-                                </Rectangle.Fill>
-                            </Rectangle>
-                            <TextBox Text="Write-Host" FontSize="16" x:Name="LinkBlock_Copy" Panel.ZIndex="2" Foreground="#FFB7B7B7" Background="{x:Null}" Margin="5,0,10,0" BorderBrush="{x:Null}" MaxLines="1" BorderThickness="0,0,0,0" IsReadOnly="True"/>
-                        </Grid>
-
                     </Grid>
 
                 </ScrollViewer>

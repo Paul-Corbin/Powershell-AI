@@ -23,7 +23,7 @@ public partial class InputWindow : Window
     {
         DragMove();
     }
-    private void CloseClick(object sender, RoutedEventArgs e) { this.Close(); }
+    private void CloseClick(object sender, RoutedEventArgs e) { this.Hide(); }
 
     private void MinimizeClick(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
     private void InputFocusLost(object sender, RoutedEventArgs e)
@@ -37,6 +37,12 @@ public partial class InputWindow : Window
         if (!this.InputBox.Text.Equals(defaultInputString)) return;
         this.InputBox.Text = "";
     }
+
+    public void ResetInput()
+    {
+        if (defaultInputString == null) return;
+        this.InputBox.Text = defaultInputString;
+    }
     private async void SubmitClick(object sender, RoutedEventArgs e) { 
         Debug.WriteLine("Submit");
         if (this.InputBox.Text.Equals("") || this.InputBox.Text.Equals(defaultInputString)) return;
@@ -45,8 +51,7 @@ public partial class InputWindow : Window
         Response response = await request.Submit(this.InputBox.Text);
         Debug.WriteLine(response.ToString());
         OutputWindow outputWindow = new OutputWindow();
-        outputWindow.Show();
-        this.Close();
+        outputWindow.Load(response);
     }
     public InputWindow()
     {
