@@ -18,8 +18,10 @@ namespace PowershellAI;
 /// </summary>
 public partial class InputWindow : Window
 {
+    private OutputWindow _outputWindow;
     private readonly string _defaultInputString = "Enter command...";
     private bool _textCleared = false;
+    private bool _submittingRequest = false;
     private void TopBarDown(object sender, RoutedEventArgs e)
     {
         try
@@ -36,6 +38,8 @@ public partial class InputWindow : Window
     }
     private void ResetInput()
     {
+        _textCleared = false;
+        _submittingRequest = false;
         this.Hide();
         this.InputBox.Text = _defaultInputString;
     }
@@ -53,32 +57,31 @@ public partial class InputWindow : Window
         this.InputBox.Text = "";
         _textCleared = true;
     }
-    private void InputGotFocus(object sender, RoutedEventArgs e) {
-        if (!this.InputBox.Text.Equals(_defaultInputString)) return;
-        this.InputBox.Text = "";
-    }
     private async void SubmitClick(object sender, RoutedEventArgs e) { 
         Debug.WriteLine("Submit");
         if (this.InputBox.Text.Equals("") || this.InputBox.Text.Equals(_defaultInputString)) return;
         var requestString = this.InputBox.Text;
         this.ResetInput();
         var request = new Request();
+        _submittingRequest = true;
         var response = await request.Submit(requestString);
         Debug.WriteLine(response.ToString());
-        var outputWindow = new OutputWindow();
-        outputWindow.Load(response);
+        _outputWindow.Load(response);
+        _submittingRequest = false;
     }
 
     private void Open(object sender, string e)
     {
+        if (this.IsVisible || _submittingRequest) return;
         this.ResetInput();
         this.Show();
+        _outputWindow.Hide();
         this.InputBox.Focus();
     }
     public InputWindow()
     {
+        _outputWindow = new OutputWindow();
         App.GlobalHotkey.HotkeyFired += Open;
         InitializeComponent();
-        this.Hide();
     }
 }
