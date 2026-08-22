@@ -8,7 +8,6 @@ namespace PowershellAI;
 /// </summary>
 public partial class InputWindow : Window
 {
-    private readonly OutputWindow _outputWindow;
     private const string DefaultInputString = "Enter command...";
     private bool _textCleared = false;
     private bool _submittingRequest = false;
@@ -58,7 +57,7 @@ public partial class InputWindow : Window
             _submittingRequest = true;
             var response = await request.Submit(requestString);
             Debug.WriteLine(response.ToString());
-            _outputWindow.Load(response);
+            App.OutputWindow.Load(response);
         } catch (Exception ex) {
             Debug.WriteLine(ex.Message);
         } finally {
@@ -69,14 +68,14 @@ public partial class InputWindow : Window
     private void Open(object? sender, string? e)
     {
         if (this.IsVisible || _submittingRequest) return;
+
         this.ResetInput();
         this.Show();
-        _outputWindow.Hide();
+        App.OutputWindow.Hide();
         this.InputBox.Focus();
     }
     public InputWindow()
     {
-        _outputWindow = new OutputWindow();
         InitializeComponent();
         if (App.GlobalHotkey == null) throw new Exception("Global hotkey is not initialized.");
         App.GlobalHotkey.HotkeyFired += Open;

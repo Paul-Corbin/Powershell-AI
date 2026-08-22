@@ -11,7 +11,7 @@ namespace PowershellAI
         private readonly HttpClient _httpClient= new HttpClient();
         private const string ApiUrl = "https://ai.hatz.ai/v1/anthropic/messages";
         private const string ApiModel = "anthropic.claude-haiku-4-5";
-        private const string ApiKey = "6ae32ae1-a8a9-44bb-bfd0-80a5bed25a3c"; // REMOVE, STORE IN CREDENTIAL MANAGER
+        //private const string ApiKey = "6ae32ae1-a8a9-44bb-bfd0-80a5bed25a3c"; // REMOVE, STORE IN CREDENTIAL MANAGER
         private const string ApiMode = "lite"; //From fastest/least tokens -> slowest/most tokens- lite, performance, turbo
         private const string MaxTokens = "300000"; //Absurdly high but good for our purposes
 
@@ -58,7 +58,12 @@ namespace PowershellAI
             Debug.WriteLine(c);
             var uri = new Uri(ApiUrl);
             var requestMesage = new HttpRequestMessage(HttpMethod.Post, uri);
-            requestMesage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", ApiKey);
+            Debug.WriteLine(App.ApiKey);
+            if (string.IsNullOrEmpty(App.ApiKey))
+            {
+                throw new InvalidOperationException("API key is not configured. Please set the API key in the application settings.");
+            }
+            requestMesage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", App.ApiKey);
             requestMesage.Content = content;
             var httpResponse = await _httpClient.SendAsync(requestMesage);
             //Really long string manipulation...

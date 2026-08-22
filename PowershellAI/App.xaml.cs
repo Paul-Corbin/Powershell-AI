@@ -8,6 +8,9 @@ namespace PowershellAI;
 /// </summary>
 public partial class App : Application
 {
+    public static string ApiKey;
+    public static OutputWindow OutputWindow;
+    public static InputWindow InputWindow;
     private TaskbarIcon? _icon;
     internal static Hotkey? GlobalHotkey { get; private set; }
 
@@ -15,11 +18,15 @@ public partial class App : Application
     {
         Shutdown();
     }
-    protected override void OnStartup(StartupEventArgs e)
+    private void Application_Startup(object s, StartupEventArgs e)
     {
-        base.OnStartup(e);
+        CredentialHelper credentialHelper = new CredentialHelper();
+        ApiKey = credentialHelper.GetApiKey();
         _icon = (TaskbarIcon?)FindResource("TrayIcon");
         GlobalHotkey = new Hotkey();
+        InputWindow = new InputWindow();
+        OutputWindow = new OutputWindow();
+        base.OnStartup(e);
     }
     protected override void OnExit(ExitEventArgs e)
     {
