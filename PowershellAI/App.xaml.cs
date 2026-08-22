@@ -1,6 +1,4 @@
 ﻿using Hardcodet.Wpf.TaskbarNotification;
-using System.Configuration;
-using System.Data;
 using System.Windows;
 
 namespace PowershellAI;
@@ -31,7 +29,7 @@ public partial class App : Application
     }
     private void ShowMenu(object sender, RoutedEventArgs e)
     {
-        if (_icon == null) return;
+        if (_icon?.ContextMenu == null) return;
         _icon.ContextMenu.IsOpen = true;
     }
 }

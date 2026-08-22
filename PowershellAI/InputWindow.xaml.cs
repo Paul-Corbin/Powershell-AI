@@ -1,15 +1,5 @@
-﻿using System.Runtime.CompilerServices;
-using System.Text;
-using System.Windows;
+﻿using System.Windows;
 using System.Diagnostics;
-using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PowershellAI;
 
@@ -18,8 +8,8 @@ namespace PowershellAI;
 /// </summary>
 public partial class InputWindow : Window
 {
-    private OutputWindow _outputWindow;
-    private readonly string _defaultInputString = "Enter command...";
+    private readonly OutputWindow _outputWindow;
+    private const string DefaultInputString = "Enter command...";
     private bool _textCleared = false;
     private bool _submittingRequest = false;
     private void TopBarDown(object sender, RoutedEventArgs e)
@@ -41,13 +31,13 @@ public partial class InputWindow : Window
         _textCleared = false;
         _submittingRequest = false;
         this.Hide();
-        this.InputBox.Text = _defaultInputString;
+        this.InputBox.Text = DefaultInputString;
     }
     private void MinimizeClick(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
     private void InputFocusLost(object sender, RoutedEventArgs e)
     {
         if (!this.InputBox.Text.Equals("")) return;
-        this.InputBox.Text = _defaultInputString;
+        this.InputBox.Text = DefaultInputString;
         _textCleared = false;
     }
 
@@ -58,19 +48,25 @@ public partial class InputWindow : Window
         _textCleared = true;
     }
     private async void SubmitClick(object sender, RoutedEventArgs e) { 
-        Debug.WriteLine("Submit");
-        if (this.InputBox.Text.Equals("") || this.InputBox.Text.Equals(_defaultInputString)) return;
-        var requestString = this.InputBox.Text;
-        this.ResetInput();
-        var request = new Request();
-        _submittingRequest = true;
-        var response = await request.Submit(requestString);
-        Debug.WriteLine(response.ToString());
-        _outputWindow.Load(response);
-        _submittingRequest = false;
+        try
+        {
+            Debug.WriteLine("Submit");
+            if (this.InputBox.Text.Equals("") || this.InputBox.Text.Equals(DefaultInputString)) return;
+            var requestString = this.InputBox.Text;
+            this.ResetInput();
+            var request = new Request();
+            _submittingRequest = true;
+            var response = await request.Submit(requestString);
+            Debug.WriteLine(response.ToString());
+            _outputWindow.Load(response);
+        } catch (Exception ex) {
+            Debug.WriteLine(ex.Message);
+        } finally {
+            _submittingRequest = false;
+        }
     }
 
-    private void Open(object sender, string e)
+    private void Open(object? sender, string? e)
     {
         if (this.IsVisible || _submittingRequest) return;
         this.ResetInput();
@@ -81,7 +77,8 @@ public partial class InputWindow : Window
     public InputWindow()
     {
         _outputWindow = new OutputWindow();
-        App.GlobalHotkey.HotkeyFired += Open;
         InitializeComponent();
+        if (App.GlobalHotkey == null) throw new Exception("Global hotkey is not initialized.");
+        App.GlobalHotkey.HotkeyFired += Open;
     }
 }

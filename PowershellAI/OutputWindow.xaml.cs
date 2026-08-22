@@ -1,18 +1,6 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 
 namespace PowershellAI
 {
@@ -47,9 +35,9 @@ namespace PowershellAI
 
         internal void Load(Response response)
         {
-            int i = 0;
-            int RowHeight = 35;
-            this.CommandBlock1.Text = response.GetCommand();
+            var i = 0;
+            var RowHeight = 35;
+            this.CommandBlock.Text = response.GetCommand();
             foreach (var reference in response.GetReferences())
             {
                 Debug.WriteLine($"New row:\nCommand: {reference.Key}\nLink: {reference.Value}\nRow: {i}");
@@ -65,6 +53,16 @@ namespace PowershellAI
             this.Height = this.TopBarGrid.Height+6;
             this.Height += i > 5 ? (5 * RowHeight) : (++i * RowHeight);
             this.Show();
+        }
+        private void Copy(object sender, RoutedEventArgs e)
+        {
+            if (this.CommandBlock.Text == "") return;
+            Clipboard.SetText(this.CommandBlock.Text);
+        }
+        private void Run(object sender, RoutedEventArgs e)
+        {
+            if (this.CommandBlock.Text == "") return;
+            Process.Start(new ProcessStartInfo("powershell.exe",$"-NoExit -Command \"{this.CommandBlock.Text}\""));
         }
     }
 }

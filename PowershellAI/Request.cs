@@ -3,7 +3,6 @@ using System.Net.Http;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text.Json.Nodes;
-using static System.Net.Mime.MediaTypeNames;
 
 namespace PowershellAI
 {

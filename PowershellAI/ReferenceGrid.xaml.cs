@@ -1,18 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Diagnostics;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
 
 namespace PowershellAI
 {
@@ -21,23 +9,22 @@ namespace PowershellAI
     /// </summary>
     public partial class ReferenceGrid : UserControl
     {
-        private string link = "";
+        private string _link = "";
         public void SetCommand(string command)
         {
             this.ReferenceCommand.Text = command;
         }
         public void SetLink(string link)
         {
-            this.link = link;
+            this._link = link;
             this.ReferenceLink.Text = link;
         }
-
-        public void OpenLink(object sender, RoutedEventArgs e)
+        private void OpenLink(object sender, RoutedEventArgs e)
         {
             // Open the link in the default web browser
-            Debug.WriteLine($"{this.ReferenceCommand.Text}: {this.link}");
-            if (this.link == "") return;
-            Process.Start(this.link);
+            Debug.WriteLine($"{this.ReferenceCommand.Text}: {this._link}");
+            if (this._link == "") return;
+            Process.Start(new ProcessStartInfo(this._link) { UseShellExecute = true });
         }
         public ReferenceGrid()
         {
