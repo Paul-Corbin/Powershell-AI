@@ -1,7 +1,8 @@
 ﻿using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
-using Windows.Security.Credentials;
+using CredentialManagement;
 
 namespace PowershellAI
 {
@@ -11,10 +12,12 @@ namespace PowershellAI
     public partial class CredentialHelper : Window
     {
         private const string DefaultInputString = "Enter API Key...";
+        private const string CredentialTarget = "PowershellAI_APIKey";
         private bool _textCleared = false;
         private TaskCompletionSource<string?> _apiKeyTaskCompletionSource;
         public CredentialHelper()
         {
+            //For testing, delete any existing credentials for this target.
             InitializeComponent();
         }
         private void TopBarDown(object sender, RoutedEventArgs e)
@@ -46,6 +49,20 @@ namespace PowershellAI
             _textCleared = false;
         }
 
+        // XAML handlers (correct casing/signatures)
+        private void APIFocusLost(object sender, RoutedEventArgs e)
+        {
+            ApiFocusLost(sender, e);
+        }
+
+        private void APIKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            // mimic original behavior
+            if (_textCleared) return;
+            this.InputBox.Text = "";
+            _textCleared = true;
+        }
+
         private void ApiKeyDown(object sender, RoutedEventArgs e)
         {
             if (_textCleared) return;
@@ -57,7 +74,27 @@ namespace PowershellAI
             if (this.InputBox.Text.Equals("") || this.InputBox.Text.Equals(DefaultInputString)) return;
             this.Hide();
             var apiKey = this.InputBox.Text;
-            bool saveSuccess = await SaveAPIKey(apiKey);
+            bool saveSuccess = await Task.Run(() =>
+            {
+                try
+                {
+                    var cred = new Credential
+                    {
+                        Target = CredentialTarget,
+                        Username = "apikey",
+                        Password = apiKey,
+                        PersistanceType = PersistanceType.LocalComputer
+                    };
+                    cred.Save();
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error saving API key: {ex.Message}");
+                    return false;
+                }
+            });
+
             if (saveSuccess)
             {
                 Debug.WriteLine("API Key saved successfully.");
@@ -66,49 +103,34 @@ namespace PowershellAI
             {
                 Debug.WriteLine("Failed to save API Key.");
             }
+
             _apiKeyTaskCompletionSource?.SetResult(apiKey);
-            this.Close();
+            this.Hide();
         }
-        internal Task<string?> LoadAPIKey()
+
+        internal async Task<string?> LoadAPIKey()
         {
-            return Task.Run(() =>
+            return await Task.Run(() =>
             {
                 try
                 {
-                    var vault = new PasswordVault();
-                    var credential = vault.Retrieve("PowershellAI", "APIKey");
-                    if (credential?.Password != null)
+                    var cred = new Credential { Target = CredentialTarget };
+                    if (cred.Load())
                     {
-                        return credential.Password;
+                        return string.IsNullOrEmpty(cred.Password) ? null : cred.Password;
                     }
                 }
                 catch (Exception ex)
                 {
                     Debug.WriteLine($"Error loading API key: {ex.Message}\nRequesting new key.");
-                    this.Show();
-                    _apiKeyTaskCompletionSource = new TaskCompletionSource<string?>();
-                    return _apiKeyTaskCompletionSource.Task.Result;
+                    // fall through to request new key
                 }
-                return null;
+
+                // Show UI to get new key
+                this.Dispatcher.Invoke(() => this.Show());
+                _apiKeyTaskCompletionSource = new TaskCompletionSource<string?>();
+                return _apiKeyTaskCompletionSource.Task.Result;
             });
-        }
-        private Task<bool> SaveAPIKey(string apiKey)
-        {
-            return Task.Run(() =>
-            {
-                try
-                {
-                    var vault = new PasswordVault();
-                    vault.Add(new PasswordCredential("PowershellAI", "APIKey", apiKey));
-                    return true;
-                }
-                catch (Exception ex)
-                {
-                    Debug.WriteLine($"Error saving API key: {ex.Message}");
-                    return false;
-                }
-            }
-            );
         }
     }
 }
