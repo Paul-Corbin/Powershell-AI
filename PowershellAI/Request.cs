@@ -58,39 +58,34 @@ namespace PowershellAI
             Debug.WriteLine(c);
             var uri = new Uri(ApiUrl);
             var requestMesage = new HttpRequestMessage(HttpMethod.Post, uri);
-            Debug.WriteLine(App.ApiKey);
-            if (string.IsNullOrEmpty(App.ApiKey))
-            {
-                throw new InvalidOperationException("API key is not configured. Please set the API key in the application settings.");
-            }
             requestMesage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", App.ApiKey);
             requestMesage.Content = content;
             var httpResponse = await _httpClient.SendAsync(requestMesage);
             //Really long string manipulation...
-            var responseText = JsonNode.Parse(
-                    await httpResponse.Content.ReadAsStringAsync()
-                )!
-                ["content"]!
-                [0]!
-                ["text"]!
-                .ToString()
-                .Replace("```json", "")
-                .Replace("```", "")
-                .Trim();
-            /*
-             Should look like this-
-             {
-                "command": "Write-Host 'Test'",
-                "references": {
-                    "Write-Host": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/write-host"
-                    
-                }
-             }
-            */
-
-            //Parse Json to get the command and the references in the correct format
             try
             {
+                var responseText = JsonNode.Parse(
+                        await httpResponse.Content.ReadAsStringAsync()
+                    )!
+                    ["content"]!
+                    [0]!
+                    ["text"]!
+                    .ToString()
+                    .Replace("```json", "")
+                    .Replace("```", "") 
+                    .Trim();
+                /*
+                 Should look like this-
+                 {
+                    "command": "Write-Host 'Test'",
+                    "references": {
+                        "Write-Host": "https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.utility/write-host"
+
+                    }
+                 }
+                */
+
+                //Parse Json to get the command and the references in the correct format
                 Debug.WriteLine(responseText);
                 JsonObject responseObject = JsonNode.Parse(responseText)!.AsObject();
                 string command = responseObject["command"]!.ToString();

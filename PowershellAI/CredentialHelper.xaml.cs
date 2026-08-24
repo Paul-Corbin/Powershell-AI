@@ -1,6 +1,9 @@
-﻿using System.Diagnostics;
+﻿using CredentialManagement;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace PowershellAI
 {
@@ -8,15 +11,17 @@ namespace PowershellAI
     /// Interaction logic for CredentialHelper.xaml
     /// </summary>
     public partial class CredentialHelper : Window
-    {   
-        private const string DefaultInputString = "Enter command...";
+    {
+        private const string DefaultInputString = "Enter API Key...";
+        private const string CredentialTarget = "PowershellAI_APIKey";
         private bool _textCleared = false;
-        internal CredentialHelper()
+        private TaskCompletionSource<string?> _apiKeyTaskCompletionSource;
+
+        public CredentialHelper()
         {
             InitializeComponent();
-            Hide();
+            this.Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/icon.ico"));
         }
-        private const string CredentialTarget = "PowershellAI_API_Key";
 
         private void TopBarDown(object sender, RoutedEventArgs e)
         {
@@ -29,99 +34,145 @@ namespace PowershellAI
                 Debug.WriteLine(exception.Message);
             }
         }
+
         private void CloseClick(object sender, RoutedEventArgs e)
         {
-            this.DialogResult = false;
-            this.Close();
+            this.ResetInput();
         }
 
-        private void MinimizeClick(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
-
-        private void FocusLost(object sender, RoutedEventArgs e)
+        private void ResetInput()
         {
-            if (!this.ApiKeyBox.Text.Equals("")) return;
-            this.ApiKeyBox.Text = DefaultInputString;
+            _textCleared = false;
+            this.Hide();
+            this.InputBox.Text = DefaultInputString;
+        }
+
+        private void MinimizeClick(object sender, RoutedEventArgs e)
+        {
+            this.WindowState = WindowState.Minimized;
+        }
+
+        private void ApiFocusLost(object sender, RoutedEventArgs e)
+        {
+            if (!this.InputBox.Text.Equals("")) return;
+            this.InputBox.Text = DefaultInputString;
             _textCleared = false;
         }
 
-        private void KeyDown(object sender, RoutedEventArgs e)
+        // XAML handlers (correct casing/signatures)
+        private void APIFocusLost(object sender, RoutedEventArgs e)
         {
+            ApiFocusLost(sender, e);
+        }
+
+        private void APIKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        {
+            // mimic original behavior
             if (_textCleared) return;
-            this.ApiKeyBox.Text = "";
+            this.InputBox.Text = "";
             _textCleared = true;
         }
-        internal void StoreApiKey(object sender, RoutedEventArgs e)
+
+        private void ApiKeyDown(object sender, RoutedEventArgs e)
         {
-            var credential = new CredentialManagement.Credential
-            {
-                Target = CredentialTarget,
-                Username = "APIKey",
-                Password = this.ApiKeyBox.Text,
-                PersistanceType = CredentialManagement.PersistanceType.LocalComputer
-            };
-            credential.Save();
-            this.DialogResult = true;           
-            this.Close();
-        }
-        internal string GetApiKey()
-        {
-            Debug.WriteLine("Attempting to retrieve API Key");
-            try
-            {
-                var credential = new CredentialManagement.Credential
-                {
-                    Target = CredentialTarget
-                };
-                credential.Load();
-                Debug.WriteLine("API Key retrieved successfully.");
-                return credential.Password;
-            }
-            catch
-            {
-                Debug.WriteLine("Unable to retrieve API Key. Requesting API Key.");
-                return RequestApiKey();
-            }
+            if (_textCleared) return;
+            this.InputBox.Text = "";
+            _textCleared = true;
         }
 
-        internal string RequestApiKey()
+        private async void SaveClick(object sender, RoutedEventArgs e)
         {
-            Debug.WriteLine("Requesting API Key.");
-            // Reset the text box state
-            this.ApiKeyBox.Text = DefaultInputString;
-            _textCleared = false;
-            this.DialogResult = null;
-
-            // Show the dialog modally
-            this.ShowDialog();
-            Debug.WriteLine("API Key dialog closed.");
-
-            // Check if user saved the key
-            if (this.DialogResult == true)
+            if (this.InputBox.Text.Equals("") || this.InputBox.Text.Equals(DefaultInputString)) return;
+            this.Hide();
+            var apiKey = this.InputBox.Text;
+            bool saveSuccess = await Task.Run(() =>
             {
-                // After user saves, try to load the stored credential
                 try
                 {
-                    var credential = new CredentialManagement.Credential
+                    var cred = new Credential
                     {
-                        Target = CredentialTarget
+                        Target = CredentialTarget,
+                        Username = "apikey",
+                        Password = apiKey,
+                        PersistanceType = PersistanceType.LocalComputer
                     };
-                    credential.Load();
-                    Debug.WriteLine("API Key successfully retrieved after dialog.");
-                    return credential.Password;
+                    cred.Save();
+                    return true;
                 }
-                catch
+                catch (Exception ex)
                 {
-                    Debug.WriteLine("API Key not stored. Requesting again.");
-                    // If still not stored, ask again recursively
-                    return RequestApiKey();
+                    Debug.WriteLine($"Error saving API key: {ex.Message}");
+                    return false;
                 }
+            });
+            if (saveSuccess)
+            {
+                Debug.WriteLine("API Key saved successfully.");
             }
             else
             {
-                // User cancelled the dialog
-                Debug.WriteLine("User cancelled API Key dialog.");
-                throw new OperationCanceledException("User cancelled API Key input.");
+                Debug.WriteLine("Failed to save API Key.");
             }
+
+            _apiKeyTaskCompletionSource?.SetResult(apiKey);
+            this.Hide();
+        }
+
+        internal async Task<string?> LoadAPIKey()
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    var cred = new Credential { Target = CredentialTarget };
+                    if (cred.Load())
+                    {
+                        return string.IsNullOrEmpty(cred.Password) ? null : cred.Password;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error loading API key: {ex.Message}\nRequesting new key.");
+                    // fall through to request new key
+                }
+
+                // Show UI to get new key
+                return UpdateAPIKey().Result;
+            });
+        }
+
+        public async Task<string?> UpdateAPIKey()
+        {
+            this.Dispatcher.Invoke(() => this.Show());
+            _apiKeyTaskCompletionSource = new TaskCompletionSource<string?>();
+            return await _apiKeyTaskCompletionSource.Task;
+        }
+
+        public async Task<bool> DeleteAPIKey()
+        {
+            return await Task.Run(() =>
+            {
+                try
+                {
+                    var cred = new Credential { Target = CredentialTarget };
+                    if (cred.Exists())
+                    {
+                        cred.Delete();
+                        Debug.WriteLine("API Key deleted successfully.");
+                        return true;
+                    }
+                    else
+                    {
+                        Debug.WriteLine("No API Key found to delete.");
+                        return false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Debug.WriteLine($"Error deleting API key: {ex.Message}");
+                    return false;
+                }
+            });
         }
     }
 }

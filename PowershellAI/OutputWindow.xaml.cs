@@ -1,6 +1,7 @@
 ﻿using System.Diagnostics;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Media.Imaging;
 
 namespace PowershellAI
 {
@@ -30,6 +31,7 @@ namespace PowershellAI
         private void MinimizeClick(object sender, RoutedEventArgs e) { this.WindowState = WindowState.Minimized; }
         public OutputWindow()
         {
+            this.Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/icon.ico"));
             InitializeComponent();
         }
 

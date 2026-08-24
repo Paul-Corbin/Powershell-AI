@@ -1,5 +1,6 @@
-﻿using System.Windows;
-using System.Diagnostics;
+﻿using System.Diagnostics;
+using System.Windows;
+using System.Windows.Media.Imaging;
 
 namespace PowershellAI;
 
@@ -68,7 +69,6 @@ public partial class InputWindow : Window
     private void Open(object? sender, string? e)
     {
         if (this.IsVisible || _submittingRequest) return;
-
         this.ResetInput();
         this.Show();
         App.OutputWindow.Hide();
@@ -76,6 +76,7 @@ public partial class InputWindow : Window
     }
     public InputWindow()
     {
+        this.Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/icon.ico"));
         InitializeComponent();
         if (App.GlobalHotkey == null) throw new Exception("Global hotkey is not initialized.");
         App.GlobalHotkey.HotkeyFired += Open;

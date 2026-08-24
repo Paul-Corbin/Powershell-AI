@@ -13,8 +13,14 @@ namespace PowershellAI
         public Hotkey()
         {
             HotkeyManager.HotkeyAlreadyRegistered += HotkeyManager_AlreadyRegistered;
-
-            HotkeyManager.Current.AddOrReplace("OpenHotkey", OpenGesture, OnHotkeyFired);
+            try
+            {
+                HotkeyManager.Current.AddOrReplace("OpenHotkey", OpenGesture, OnHotkeyFired);
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine($"Error registering hotkey: {ex.Message}");
+            }
         }
 
         private void HotkeyManager_AlreadyRegistered(object sender, HotkeyAlreadyRegisteredEventArgs e)

@@ -3,15 +3,21 @@
     <PropertyGroup>
         <OutputType>WinExe</OutputType>
         <TargetFramework>net9.0-windows</TargetFramework>
+        <UseWPF>true</UseWPF>
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
-        <UseWPF>true</UseWPF>
         <RootNamespace>PowershellAI</RootNamespace>
     </PropertyGroup>
-	<ItemGroup>
-		<PackageReference Include="CredentialManagement" Version="1.0.2" />
-		<PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
-		<PackageReference Include="NHotkey.Wpf" Version="4.0.0" />
-		<PackageReference Include="NHotkey.Wpf" Version="4.0.0" />
-	</ItemGroup>
+
+    <ItemGroup>
+      <None Remove="Resources\icon.ico" />
+    </ItemGroup>
+    <ItemGroup>
+        <PackageReference Include="CredentialManagement" Version="1.0.2" />
+        <PackageReference Include="Hardcodet.NotifyIcon.Wpf" Version="2.0.1" />
+        <PackageReference Include="NHotkey.Wpf" Version="4.0.0" />
+    </ItemGroup>
+    <ItemGroup>
+      <Resource Include="Resources\icon.ico" />
+    </ItemGroup>
 </Project>
