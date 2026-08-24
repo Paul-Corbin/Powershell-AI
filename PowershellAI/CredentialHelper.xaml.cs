@@ -14,12 +14,12 @@ namespace PowershellAI
     {
         private const string DefaultInputString = "Enter API Key...";
         private const string CredentialTarget = "PowershellAI_APIKey";
-        private bool _textCleared = false;
         private TaskCompletionSource<string?> _apiKeyTaskCompletionSource;
 
         public CredentialHelper()
         {
             InitializeComponent();
+            InputBox.Text = DefaultInputString;
             this.Icon = new BitmapImage(new Uri("pack://application:,,,/Resources/icon.ico"));
         }
 
@@ -42,7 +42,6 @@ namespace PowershellAI
 
         private void ResetInput()
         {
-            _textCleared = false;
             this.Hide();
             this.InputBox.Text = DefaultInputString;
         }
@@ -56,36 +55,21 @@ namespace PowershellAI
         {
             if (!this.InputBox.Text.Equals("")) return;
             this.InputBox.Text = DefaultInputString;
-            _textCleared = false;
         }
 
-        // XAML handlers (correct casing/signatures)
-        private void APIFocusLost(object sender, RoutedEventArgs e)
-        {
-            ApiFocusLost(sender, e);
-        }
-
-        private void APIKeyDown(object sender, System.Windows.Input.KeyEventArgs e)
+        private void ApiGainFocus(object sender, RoutedEventArgs e)
         {
             // mimic original behavior
-            if (_textCleared) return;
+            if (!InputBox.Text.Equals(DefaultInputString)) return;
             this.InputBox.Text = "";
-            _textCleared = true;
-        }
-
-        private void ApiKeyDown(object sender, RoutedEventArgs e)
-        {
-            if (_textCleared) return;
-            this.InputBox.Text = "";
-            _textCleared = true;
         }
 
         private async void SaveClick(object sender, RoutedEventArgs e)
         {
             if (this.InputBox.Text.Equals("") || this.InputBox.Text.Equals(DefaultInputString)) return;
-            this.Hide();
             var apiKey = this.InputBox.Text;
-            bool saveSuccess = await Task.Run(() =>
+            ResetInput();
+            var saveSuccess = await Task.Run(() =>
             {
                 try
                 {
@@ -115,7 +99,6 @@ namespace PowershellAI
             }
 
             _apiKeyTaskCompletionSource?.SetResult(apiKey);
-            this.Hide();
         }
 
         internal async Task<string?> LoadAPIKey()
@@ -143,7 +126,7 @@ namespace PowershellAI
 
         public async Task<string?> UpdateAPIKey()
         {
-            this.Dispatcher.Invoke(() => this.Show());
+            this.Dispatcher.Invoke(this.Show);
             _apiKeyTaskCompletionSource = new TaskCompletionSource<string?>();
             return await _apiKeyTaskCompletionSource.Task;
         }

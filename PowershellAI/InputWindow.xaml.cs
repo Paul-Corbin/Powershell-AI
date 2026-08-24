@@ -10,7 +10,6 @@ namespace PowershellAI;
 public partial class InputWindow : Window
 {
     private const string DefaultInputString = "Enter command...";
-    private bool _textCleared = false;
     private bool _submittingRequest = false;
     private void TopBarDown(object sender, RoutedEventArgs e)
     {
@@ -28,8 +27,6 @@ public partial class InputWindow : Window
     }
     private void ResetInput()
     {
-        _textCleared = false;
-        _submittingRequest = false;
         this.Hide();
         this.InputBox.Text = DefaultInputString;
     }
@@ -38,14 +35,12 @@ public partial class InputWindow : Window
     {
         if (!this.InputBox.Text.Equals("")) return;
         this.InputBox.Text = DefaultInputString;
-        _textCleared = false;
     }
 
-    private void InputKeyDown(object sender, RoutedEventArgs e)
+    private void InputGainFocus(object sender, RoutedEventArgs e)
     {
-        if (_textCleared) return;
+        if (!InputBox.Text.Equals(DefaultInputString)) return;
         this.InputBox.Text = "";
-        _textCleared = true;
     }
     private async void SubmitClick(object sender, RoutedEventArgs e) { 
         try
@@ -72,7 +67,6 @@ public partial class InputWindow : Window
         this.ResetInput();
         this.Show();
         App.OutputWindow.Hide();
-        this.InputBox.Focus();
     }
     public InputWindow()
     {
