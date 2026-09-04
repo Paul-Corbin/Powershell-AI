@@ -49,13 +49,13 @@
                                                                                                 
 ## Project Structure
                                                                                                 
-  PowerShell-AI/
-  ├── PowershellAI/          # Main application code
-  │   ├── Program.cs         # Application entry point
-  │   └── [Other source files]
-  ├── PowershellAI.csproj    # Project configuration
-  ├── PowershellAI.sln       # Visual Studio solution
-  └── README.md              # This file
+  - PowerShell-AI/
+  - ├── PowershellAI/          # Main application code
+  - │   ├── Program.cs         # Application entry point
+  - │   └── [Other source files]
+  - ├── PowershellAI.csproj    # Project configuration
+  - ├── PowershellAI.sln       # Visual Studio solution
+  - └── README.md              # This file
 
 ## Security & Privacy
   
@@ -64,10 +64,9 @@
   - No command history or personal data is sent beyond what's necessary for API calls
   - Your commands remain private and are only sent to Claude's API
    
-    - ## Development
-   
-    - ### Tech Stack
-    - - **Language**: C#
-    - - **Framework**: .NET
-    - - **UI**: Windows Forms / WPF
-    - - **API**: Anthropic Claude API
+## Development
+  ### Tech Stack
+  - **Language**: C#
+  - **Framework**: .NET
+  - **UI**: Windows Forms / WPF
+  - **API**: Anthropic Claude API
